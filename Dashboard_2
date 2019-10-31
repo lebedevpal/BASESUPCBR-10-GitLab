@@ -5,11 +5,11 @@ index="bl_logging"
 | eval stv=pis_scenario_type . " (" . pis_scenario_version . ")"
 
 |fields lTime, fNode, severity, stv
-lastNode, errors, info
+#lastNode, errors, info
 
 
-| rename lTime as "Дата", fNode as "УИ"
-, as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
+#| rename lTime as "Дата", fNode as "УИ"
+#, as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
 
 ##########
 Дата : _time, earliest(_time) as fTime, latest(_time) as lTime
