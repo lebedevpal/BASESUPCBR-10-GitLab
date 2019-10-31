@@ -1,0 +1,17 @@
+index="bl_logging" 
+| stats 
+
+|fields nm, firstNode, lastNode, errors, info
+
+
+| rename nm as "Дата", pis_node_name as "УИ", as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
+
+##########
+Дата
+УИ :	pis_node_name
+Тип сообщения :	severity
+ИСЦ	: pis_scenario_type+pis_scenario_version
+ИС :
+ЭИСЦ : pis_scenario_name
+ЭИС :  pis_service_name
+Сообщение : 
