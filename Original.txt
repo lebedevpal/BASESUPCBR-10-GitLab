@@ -1,0 +1,39 @@
+index="bl_logging" pis_node_name=* 
+
+|   rex max_match=0 "(?=[^,]*(?:, файл: |,.*, файл: ))^(?:[^'\n]*'){3}(?P<fileName>[^']+)" 
+
+|   rex "(?=[^Б]*(?:Будет выполнена отправка|Б.*Будет выполнена отправка))^[^:\n]*:(?P<receiver>[^ ]+)" 
+
+|   rex "(?=[^О]*(?:Обработка сообщения:|О.*Обработка сообщения:))^(?:[^'\n]*'){5}(?P<inputSizeB>\d+)"
+
+|   rex "(?=[^О]*(?:Отправка|О.*Отправка))^(?:[^ \n]* ){4}(?P<outputSizeB>\d+)"
+
+| stats earliest(pis_node_name) as fNode, latest(pis_node_name) as lNode, max(eval(if(match(severity, "ERROR"), 1, 0))) as errors, earliest(fileName) as fileName, earliest(_time) as fTime, latest(_time) as lTime, values(receiver) as receiver, earliest(inputSizeB) as inputSizeB, latest(outputSizeB) as outputSizeB by pis_scenario_name, pis_scenario_version, pis_message_ref_uuid 
+
+| eval raceDuration=lTime-fTime  
+
+| eval inputSize = if(inputSizeB >(1024*1024*1024), tostring(round(inputSizeB/(1024*1024*1024), 2)) +" Гб", if(inputSizeB > (1024*1024), tostring(round(inputSizeB/(1024*1024), 2))+" Мб", if(inputSizeB > 1024, tostring(round(inputSizeB/1024, 2))+" Кб", tostring(coalesce(inputSizeB, 0))+" Б"))) 
+
+| eval txt=strftime(fTime, "%d.%m %H:%M:%S") . " - " . strftime(lTime, "%H:%M:%S") . " - " . fileName . " (" . coalesce(inputSize, "неизв.") . ") "
+
+| stats first(fNode) as firstNode, last(lNode) as lastNode, count as cnt, sum(errors) as errors, values(txt) as txt, values(receiver) as receiver, sum(inputSizeB) as inputSizeB, sum(outputSizeB) as outputSizeB, max(raceDuration) as maxDuration by pis_scenario_name, pis_scenario_version
+
+| convert timeformat="%d.%m %H:%M:%S" ctime(*Time) 
+
+| eval nm=pis_scenario_name . " (" . pis_scenario_version . ")"   
+
+| eval sumInputSize = if(inputSizeB >(1024*1024*1024), tostring(round(inputSizeB/(1024*1024*1024), 2)) +" Гб", if(inputSizeB > (1024*1024), tostring(round(inputSizeB/(1024*1024), 2))+" Мб", if(inputSizeB > 1024, tostring(round(inputSizeB/1024, 2))+" Кб", tostring(coalesce(inputSizeB, 0))+" Б")))
+| eval sumOutputSize = if(outputSizeB >(1024*1024*1024), tostring(round(outputSizeB/(1024*1024*1024), 2)) +" Гб", if(outputSizeB > (1024*1024), tostring(round(outputSizeB/(1024*1024), 2))+" Мб", if(outputSizeB > 1024, tostring(round(outputSizeB/1024, 2))+" Кб", tostring(coalesce(outputSizeB, 0))+" Б")))
+| eval duration=tostring(maxDuration, "duration")
+| eval raceVolumes=sumInputSize . " /" . sumOutputSize
+
+| appendcols [search index="bl_logging" pis_node_name=*
+     
+	| dedup pis_message_ref_uuid 
+     
+	| stats sparkline count as sp by pis_scenario_name, pis_scenario_version
+      
+| fields sparkline]
+|fields nm, firstNode, lastNode, raceVolumes, cnt, errors,  sparkline, txt
+
+| rename nm as "ИСц", cnt as "Файлов", errors as "Ошибок", firstNode as "УИ получателя", lastNode as "УИ источника", duration as "Макс. длительность (чч:мм:сс.мс)", pis_scenario_version as "Версия", sparkline as "Таймлайн", txt as "Передачи (дд.мм чч:мм:сс-чч:мм:сс - имя файла (размер))", receiver as "Получатели", sumInputSize as "Принято", sumOutputSize as "Передано", raceVolumes as "Принято/Передано"
