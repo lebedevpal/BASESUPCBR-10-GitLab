@@ -1,7 +1,7 @@
 index="bl_logging" 
-| stats latest(_time) as lTime, earliest(pis_node_name) as fNode, 
+| stats latest(_time) as lTime, earliest(pis_node_name) as fNode, severity
 
-|fields lTime, fNode,
+|fields lTime, fNode, severity
 lastNode, errors, info
 
 
