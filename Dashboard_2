@@ -1,13 +1,15 @@
 index="bl_logging" 
-| stats 
+| stats latest(_time) as lTime, earliest(pis_node_name) as fNode, 
 
-|fields nm, firstNode, lastNode, errors, info
+|fields lTime, fNode,
+lastNode, errors, info
 
 
-| rename nm as "Дата", pis_node_name as "УИ", as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
+| rename lTime as "Дата", fNode as "УИ"
+, as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
 
 ##########
-Дата
+Дата : _time, earliest(_time) as fTime, latest(_time) as lTime
 УИ :	pis_node_name
 Тип сообщения :	severity
 ИСЦ	: pis_scenario_type+pis_scenario_version
