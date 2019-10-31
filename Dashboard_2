@@ -1,7 +1,10 @@
 index="bl_logging" 
 | stats latest(_time) as lTime, earliest(pis_node_name) as fNode, severity
 
-|fields lTime, fNode, severity
+
+| eval stv=pis_scenario_type . " (" . pis_scenario_version . ")"
+
+|fields lTime, fNode, severity, stv
 lastNode, errors, info
 
 
