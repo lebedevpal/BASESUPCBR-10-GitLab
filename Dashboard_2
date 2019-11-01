@@ -11,10 +11,11 @@
 
 ##########
 
-index="bl_logging" | sort -_time
+index="bl_logging" pis_node_name=* severity=* pis_scenario_type=* pis_scenario_version=* pis_scenario_name=* pis_service_name=*
 | stats earliest(pis_node_name) as fNode
 | eval stv=pis_scenario_type . " (" . pis_scenario_version . ")"
 | fields lTime, fNode, stv
+| sort -_time
 
 #severity, stv, pis_scenario_name, pis_service_name
 #lastNode, errors, info
