@@ -4,10 +4,10 @@
 УИ :	pis_node_name
 Тип сообщения :	severity
 ИСЦ	: pis_scenario_type+pis_scenario_version
-ИС :
+ИС :?
 ЭИСЦ : pis_scenario_name
 ЭИС :  pis_service_name
-Сообщение : 
+Сообщение : EventText
 
 ##########
 
