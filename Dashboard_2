@@ -11,18 +11,5 @@
 
 ##########
 
-index="bl_logging" pis_node_name=* severity=* pis_scenario_type=* pis_scenario_version=* pis_scenario_name=* pis_service_name=*
-| stats earliest(pis_node_name) as fNode
-| eval stv=pis_scenario_type . " (" . pis_scenario_version . ")"
-| fields lTime, fNode, stv
-| sort -_time
-
-#severity, stv, pis_scenario_name, pis_service_name
-#lastNode, errors, info
-
-
-#| rename lTime as "Дата", fNode as "УИ"
-#, as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
-
-
-Тест Sublime merge
+index=bl_logging sourcetype=bl_logging pis_node_name=* severity =* pis_scenario_type=* pis_scenario_version=* pis_scenario_name=* pis_scenario_version=* pis_service_name=*
+| table _time, pis_scenario_name, pis_scenario_version
