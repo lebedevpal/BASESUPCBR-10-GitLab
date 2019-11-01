@@ -1,8 +1,19 @@
-index="bl_logging" 
-| stats latest(_time) as lTime, earliest(pis_node_name) as fNode
+##########
 
+Дата : _time
+УИ :	pis_node_name
+Тип сообщения :	severity
+ИСЦ	: pis_scenario_type+pis_scenario_version
+ИС :
+ЭИСЦ : pis_scenario_name
+ЭИС :  pis_service_name
+Сообщение : 
+
+##########
+
+index="bl_logging" | sort -_time
+| stats earliest(pis_node_name) as fNode
 | eval stv=pis_scenario_type . " (" . pis_scenario_version . ")"
-
 | fields lTime, fNode, stv
 
 #severity, stv, pis_scenario_name, pis_service_name
@@ -12,14 +23,5 @@ index="bl_logging"
 #| rename lTime as "Дата", fNode as "УИ"
 #, as "Тип сообщения",  as "ИСЦ", as "ИС", as "ЭИСЦ", as "ЭИС", as "Сообщение"
 
-##########
-Дата : _time, earliest(_time) as fTime, latest(_time) as lTime
-УИ :	pis_node_name
-Тип сообщения :	severity
-ИСЦ	: pis_scenario_type+pis_scenario_version
-ИС :
-ЭИСЦ : pis_scenario_name
-ЭИС :  pis_service_name
-Сообщение : 
 
 Тест Sublime merge
