@@ -12,13 +12,14 @@
 ##########
 
 index=bl_logging sourcetype =bl_logging pis_node_name=* severity =* pis_scenario_type=* pis_scenario_version=* pis_scenario_name=* pis_scenario_version=* pis_service_name=*
+
 | fillnull value=" " pis_service_name,pis_scenario_name| search pis_service_name=* pis_scenario_name=* pis_service_type=* 
 | rex max_match=0 "(?ms)^\s*(?<multiValueField>[^\r\n]+)\s*$" 
 | eval EventText=multiValueField 
-| eval event_time=strftime(_time, "%Y-%m-%d %H:%M:%S,%3Q")
+| eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
+
 | eval snv=pis_scenario_name . " (" . pis_scenario_version . ")"  
-| table _time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
 
+| table Time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
 
-#EventText - Текст сообщения, которое ищется по регулярному выражению
-#event_time - Переделанный формат времени
+| rename Time as "Время сообщения", pis_node_name as "УИ", severity as "Тип сообщения", snv as "ИСЦ", pis_scenario_name as "ЭИСЦ", pis_service_name as "ЭИС", EventText as "Сообщение"
