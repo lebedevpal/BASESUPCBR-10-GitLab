@@ -6,7 +6,7 @@ index=bl_logging sourcetype =bl_logging pis_node_name=* severity =* pis_scenario
 | eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
 
 | eval snv=pis_scenario_name . " (" . pis_scenario_version . ")"  
-| where severity="ERROR"
+| where severity="INFO"
 | table Time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
 
 | rename Time as "Время сообщения", pis_node_name as "УИ", severity as "Тип сообщения", snv as "ИСЦ", pis_scenario_name as "ЭИСЦ", pis_service_name as "ЭИС", EventText as "Сообщение"
