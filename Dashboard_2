@@ -1,16 +1,3 @@
-##########
-
-Дата : _time
-УИ :	pis_node_name
-Тип сообщения :	severity
-ИСЦ	: pis_scenario_type+pis_scenario_version
-ИС :?
-ЭИСЦ : pis_scenario_name
-ЭИС :  pis_service_name
-Сообщение : EventText
-
-##########
-
 index=bl_logging sourcetype =bl_logging pis_node_name=* severity =* pis_scenario_type=* pis_scenario_version=* pis_scenario_name=* pis_scenario_version=* pis_service_name=*
 
 | fillnull value=" " pis_service_name,pis_scenario_name| search pis_service_name=* pis_scenario_name=* pis_service_type=* 
@@ -19,7 +6,7 @@ index=bl_logging sourcetype =bl_logging pis_node_name=* severity =* pis_scenario
 | eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
 
 | eval snv=pis_scenario_name . " (" . pis_scenario_version . ")"  
-
+| where severity="ERROR"
 | table Time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
 
 | rename Time as "Время сообщения", pis_node_name as "УИ", severity as "Тип сообщения", snv as "ИСЦ", pis_scenario_name as "ЭИСЦ", pis_service_name as "ЭИС", EventText as "Сообщение"
