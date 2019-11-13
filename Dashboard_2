@@ -4,7 +4,7 @@ index=bl_logging sourcetype =bl_logging pis_node_name=* severity =* pis_scenario
 | eval EventText=multiValueField 
 | eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
 
-| eval snv=pis_scenario_name . " (" . pis_scenario_version . ")"  
+| eval snv=pis_scenario_name . " (" . pis_scenario_version . ")" = $token_snv$
 
 | table Time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
 
