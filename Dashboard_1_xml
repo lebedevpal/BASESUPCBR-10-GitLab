@@ -38,9 +38,9 @@
         </format>
         <drilldown>
           <condition field="ИСЦ">
-          <link target="_blank">/app/pis/basesupcbr10_2?nm=$click.value2$</link>
-           </condition>
-        </drilldown>
+            <link target="_blank">https://yandex.ru/search/?text=$click.value2$</link>
+          </condition>
+		</drilldown>
       </table>
     </panel>
   </row>
