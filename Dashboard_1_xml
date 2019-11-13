@@ -1,0 +1,47 @@
+<dashboard>
+  <label>BASESUPCBR-10_1</label>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>index="bl_logging" 
+| stats earliest(pis_node_name) as fNode, latest(pis_node_name) as lNode, max(eval(if(match(severity, "ERROR"), 1, 0))) as errors, max(eval(if(match(severity, "INFO"), 1, 0))) as info, earliest(fileName) as fileName, earliest(_time) as fTime, latest(_time) as lTime, values(receiver) as receiver, latest(outputSizeB) as outputSizeB by pis_scenario_name, pis_scenario_version, pis_message_ref_uuid 
+
+
+| stats first(fNode) as firstNode, last(lNode) as lastNode, sum(errors) as errors, sum(info) as info, values(txt) as txt, values(receiver) as receiver, sum(inputSizeB) as inputSizeB, sum(outputSizeB) as outputSizeB, max(raceDuration) as maxDuration by pis_scenario_name, pis_scenario_version
+
+| convert timeformat="%d.%m %H:%M:%S" ctime(*Time) 
+
+
+| eval nm=pis_scenario_name . " (" . pis_scenario_version . ")"   
+
+
+
+|fields nm, firstNode, lastNode, errors, info
+
+
+| rename nm as "ИСЦ", errors as "Ошибок", firstNode as "УИ получателя", lastNode as "УИ источника", info as "Информационных сообщений"</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Информационных сообщений">
+          <colorPalette type="list">[#65A637,#6DB7C6,#F7BC38,#F58F39,#D93F3C]</colorPalette>
+          <scale type="threshold">10,50,100,100</scale>
+        </format>
+        <drilldown>
+          <condition field="ИСЦ">
+          <link target="_blank">/app/pis/basesupcbr10_2?nm=$click.value2$</link>
+           </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</dashboard>
