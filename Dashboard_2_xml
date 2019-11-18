@@ -1,5 +1,23 @@
-<dashboard>
+<form>
   <label>BASESUPCBR-10_2</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="message_tok">
+      <label>Тип сообщения</label>
+      <choice value="&quot;ERROR&quot;+INFO&quot;">ALL</choice>
+      <choice value="&quot;INFO&quot;">INFO</choice>
+      <choice value="&quot;ERROR&quot;">ERROR</choice>
+      <search>
+        <query/>
+      </search>
+    </input>
+  </fieldset>
   <row>
     <panel>
       <table>
@@ -11,7 +29,7 @@
 | eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
 
 | eval snv=pis_scenario_name . " (" . pis_scenario_version . ")"  
-| where severity="INFO"
+| where severity=$message_tok$
 | table Time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
 
 | rename Time as "Время сообщения", pis_node_name as "УИ", severity as "Тип сообщения", snv as "ИСЦ", pis_scenario_name as "ЭИСЦ", pis_service_name as "ЭИС", EventText as "Сообщение"</query>
@@ -23,6 +41,7 @@
         <option name="dataOverlayMode">none</option>
         <option name="drilldown">none</option>
         <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
         <option name="rowNumbers">false</option>
         <option name="totalsRow">false</option>
         <option name="wrap">true</option>
@@ -33,4 +52,4 @@
       </table>
     </panel>
   </row>
-</dashboard>
+</form>
