@@ -1,0 +1,65 @@
+<form>
+  <label>BASESUPCBR-10_2</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time_token" searchWhenChanged="true">
+      <label>Временной период</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="pis_node_name_tok">
+      <label>УИ</label>
+      <choice value="pis_node_name in (&quot;kcoi1&quot;,&quot;kcoi2&quot;,&quot;kcoimr&quot;,&quot;rhdit&quot;)">ALL</choice>
+      <choice value="pis_node_name=&quot;kcoi1&quot;">kcoi1</choice>
+      <choice value="pis_node_name=&quot;kcoi2&quot;">kcoi2</choice>
+      <choice value="pis_node_name=&quot;kcoimr&quot;">kcoimr</choice>
+      <choice value="pis_node_name=&quot;rhdit&quot;">rhdit</choice>
+      <default>pis_node_name in ("kcoi1","kcoi2","kcoimr","rhdit")</default>
+    </input>
+    <input type="dropdown" token="message_tok">
+      <label>Тип сообщения</label>
+      <choice value="severity in (&quot;INFO&quot;,&quot;ERROR&quot;)">ALL</choice>
+      <choice value="severity=&quot;INFO&quot;">INFO</choice>
+      <choice value="severity=&quot;ERROR&quot;">ERROR</choice>
+      <search>
+        <query/>
+      </search>
+      <default>severity in ("INFO","ERROR")</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Лог работы ИСЦ</title>
+      <table>
+        <search>
+          <query>index=bl_logging sourcetype =bl_logging pis_node_name=* severity =* pis_scenario_type=* pis_scenario_version=* pis_scenario_name=* pis_scenario_version=* pis_service_name=*
+
+| rex max_match=0 "(?ms)^\s*(?&lt;multiValueField&gt;[^\r\n]+)\s*$$" 
+| eval EventText=multiValueField 
+| eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
+| eval snv=pis_scenario_name . " (" . pis_scenario_version . ")"
+| where $pis_node_name_tok$
+| where $message_tok$
+| table Time, pis_node_name, severity,  snv, pis_scenario_name, pis_scenario_version, EventText
+| rename Time as "Время сообщения", pis_node_name as "УИ", severity as "Тип сообщения", snv as "ИСЦ", pis_scenario_name as "ЭИСЦ", pis_service_name as "ЭИС", EventText as "Сообщение"</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="number" field="Тип сообщения"></format>
+        <format type="color" field="Тип сообщения">
+          <colorPalette type="map">{"ERROR":#D93F3C,"INFO":#A2CC3E}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
