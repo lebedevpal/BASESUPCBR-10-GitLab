@@ -1,0 +1,46 @@
+<form>
+  <label>BASESUPCBR-10_1</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time_token" searchWhenChanged="true">
+      <label>Временной период</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Состояние ИСЦ</title>
+      <table>
+        <search>
+          <query>index="bl_logging" 
+| stats earliest(pis_node_name) as fNode, latest(pis_node_name) as lNode, max(eval(if(match(severity, "ERROR"), 1, 0))) as errors, max(eval(if(match(severity, "INFO"), 1, 0))) as info, earliest(fileName) as fileName, earliest(_time) as fTime, latest(_time) as lTime, values(receiver) as receiver, latest(outputSizeB) as outputSizeB by pis_scenario_name, pis_scenario_version, pis_message_ref_uuid 
+
+| stats first(fNode) as firstNode, last(lNode) as lastNode, sum(errors) as errors, sum(info) as info, values(txt) as txt, values(receiver) as receiver, sum(inputSizeB) as inputSizeB, sum(outputSizeB) as outputSizeB, max(raceDuration) as maxDuration by pis_scenario_name, pis_scenario_version
+
+| convert timeformat="%d.%m %H:%M:%S" ctime(*Time) 
+
+| eval nm=pis_scenario_name . " (" . pis_scenario_version . ")"   
+
+|fields nm, firstNode, lastNode, errors, info
+
+| rename nm as "ИСЦ", errors as "Ошибок", firstNode as "УИ получателя", lastNode as "УИ источника", info as "Информационных сообщений"</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link target="_blank">/app/pis/basesupcbr10_2?pis_node_name=$click.value2$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>
